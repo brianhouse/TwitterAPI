@@ -114,7 +114,7 @@ class TwitterAPI(object):
             return '%s://%s.%s/%s'         % (PROTOCOL,
                                               subdomain,
                                               DOMAIN,
-                                              path)        
+                                              path)
         elif self.version == '1.1':
             return '%s://%s.%s/%s/%s.json' % (PROTOCOL,
                                               subdomain,
@@ -170,7 +170,7 @@ class TwitterAPI(object):
             if method_override in method:
                 method = method_override # use method_override
             else:
-                raise Exception(f'Endpoint "{endpoint}" with method "{method_override}" unsupported')
+                raise Exception('Endpoint "{%s}" with method "{%s}" unsupported' % (endpoint, method_override))
 
         with requests.Session() as session:
             session.auth = self.auth
@@ -200,14 +200,14 @@ class TwitterAPI(object):
             else:
                 p = params
 
-            try:           
+            try:
                 if False and method == 'PUT':
-                    session.headers['Content-type'] = 'application/json'            
-                    data = params                        
+                    session.headers['Content-type'] = 'application/json'
+                    data = params
                     r = session.request(
                         method,
                         url,
-                        json=data)                
+                        json=data)
                 else:
                     r = session.request(
                         method,
@@ -326,7 +326,7 @@ class _RestIterable(object):
                     resp['data'] = [resp['data']]
                 h_type = options['hydrate_type']
                 if 'includes' in resp and h_type != HydrateType.NONE:
-                    field_suffix = '' if h_type == HydrateType.REPLACE else '_hydrate'                        
+                    field_suffix = '' if h_type == HydrateType.REPLACE else '_hydrate'
                     self.results = _hydrate_tweets(resp['data'], resp['includes'], field_suffix)
                 else:
                     self.results = resp['data']
@@ -415,7 +415,7 @@ class _StreamingIterable(object):
                         h_type = self.options['hydrate_type']
                         if h_type != HydrateType.NONE:
                             if 'data' in item and 'includes' in item:
-                                field_suffix = '' if h_type == HydrateType.REPLACE else '_hydrate' 
+                                field_suffix = '' if h_type == HydrateType.REPLACE else '_hydrate'
                                 item = { 'data':_hydrate_tweets(item['data'], item['includes'], field_suffix) }
                 yield item
             except (ConnectionError, ValueError, ProtocolError, ReadTimeout, ReadTimeoutError,
@@ -445,7 +445,7 @@ def _hydrate_tweets(data, includes, field_suffix):
                          Either "_hydrate" which puts hydrated values into
                          a new field, or "" which replaces the current
                          field value with hydrated values.
-                         
+
     :returns: Tweet status as a JSON object.
     """
     new_fields = []
@@ -481,7 +481,7 @@ def _create_include_fields(parent, include, new_fields):
         for item in parent:
             _create_include_fields(item, include, new_fields)
     elif isinstance(parent, dict):
-        for key, value in parent.items():
+        for key, value in list(parent.items()):
             if value == include[0]:
                 new_fields.append((parent, key, include[1]))
             elif isinstance(value, list) and all(isinstance(elem, str) for elem in value):
